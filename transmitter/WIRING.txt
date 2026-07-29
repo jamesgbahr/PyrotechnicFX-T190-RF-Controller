@@ -1,0 +1,10 @@
+PYROTECHNICFX T190 TRANSMITTER v1.6.3
+=====================================
+Relay 1: onboard USER button, GPIO21
+Relay 2: external normally-open momentary button, GPIO1 to GND
+Relay 3: external normally-open momentary button, GPIO2 to GND
+Relay 4: external normally-open momentary button, GPIO3 to GND
+Relay 5: external normally-open momentary button, GPIO4 to GND
+Relay 6: external normally-open momentary button, GPIO15 to GND
+
+All inputs use INPUT_PULLUP. Pressed = connected to GND.

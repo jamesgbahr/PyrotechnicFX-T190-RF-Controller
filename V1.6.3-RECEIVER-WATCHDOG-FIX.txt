@@ -1,0 +1,12 @@
+PyrotechnicFX T190 v1.6.3 receiver reboot repair
+
+The v1.6.2 receiver ran RadioLib's blocking receive call continuously in a
+high-priority task pinned to Core 0. The supplied video shows the main screen
+remaining active for approximately five to six seconds before each reboot,
+which matches ESP32 task-watchdog starvation behavior.
+
+v1.6.3 replaces this path with interrupt-driven DIO1 receive. The receiver RF
+task sleeps on a FreeRTOS notification while idle and yields after processing,
+so Core 0 system and idle tasks are not starved.
+
+Protocol and graphics are unchanged. Only the receiver requires reflashing.

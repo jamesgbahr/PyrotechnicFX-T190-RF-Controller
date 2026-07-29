@@ -1,0 +1,11 @@
+PyrotechnicFX T190 v1.6.3 validation summary
+
+- Reviewed the full 15.99-second receiver video. Main UI runs about 5-6 seconds, then the board resets and repeats the boot sequence.
+- Located the receiver's high-priority Core 0 tight loop around blocking `radio.receive()`.
+- Replaced blocking polling with DIO1 interrupt-driven `startReceive()` / `readData()`.
+- RF task now sleeps on task notification and explicitly yields.
+- Verified source contains no receiver `radio.receive()` call.
+- Verified failsafe and ACK ordering are preserved.
+- TX source and all v1.6.2 visual assets are preserved.
+- ZIP integrity and internal manifests regenerated.
+- PlatformIO ESP32-S3 compile and physical test are not available in this container.

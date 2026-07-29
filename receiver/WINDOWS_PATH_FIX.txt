@@ -1,0 +1,18 @@
+PyrotechnicFX T190 Receiver v1.6.3 — Windows build correction
+
+CAUSE OF THE v1.4.2 FAILURE
+The uploaded traceback shows Windows error 206 while PlatformIO copies deeply nested RadioLib example folders into a deeply nested project .pio directory. The dependency itself was downloaded; the destination path became too long.
+
+FIX IN THIS RELEASE
+platformio.ini now sets:
+
+workspace_dir = ${sysenv.USERPROFILE}/.pfxpio/rx
+
+This relocates build products and libdeps to a short path independent of the Downloads/extraction folder depth.
+
+FIRST BUILD
+Run scripts\clean_build.bat
+
+OUTPUT
+Firmware will be created beneath:
+%USERPROFILE%\.pfxpio\rx\build\t190_receiver\firmware.bin

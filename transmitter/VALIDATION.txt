@@ -1,0 +1,20 @@
+PyrotechnicFX T190 v1.6.3 transmitter validation
+
+Completed in package build:
+- C++17 syntax check of main.cpp, ui.cpp, and radio_support.cpp using API stubs
+- boot bitmap checked at 170 x 320
+- main chrome checked at 170 x 320
+- all 12 relay card bitmaps checked at 52 x 64
+- generated RGB565 headers regenerated from final PNG assets
+- no setBootProgress calls
+- no ACK_TIMEOUT_MS configuration
+- no STATE_CHANGE_BURST queue
+- UI runtime card dimensions match generated asset dimensions
+- Serial writes moved to a nonblocking low-priority logger queue
+
+Still required on physical hardware:
+- PlatformIO dependency download and ESP32-S3 compile
+- flash and observe boot/main transition
+- measure button edge detect_to_tx lines
+- test all six channels with LEDs or a logic analyzer
+- verify receiver failsafe and ACK telemetry

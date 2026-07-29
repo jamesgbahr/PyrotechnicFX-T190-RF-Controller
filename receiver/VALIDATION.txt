@@ -1,0 +1,8 @@
+PyrotechnicFX T190 Receiver v1.6.3 validation
+
+- Confirmed no blocking `radio.receive()` call remains in receiver source.
+- Confirmed receiver uses DIO1 packet callback, `startReceive()`, `readData()`, task notifications, and explicit FreeRTOS yields.
+- Confirmed relay output changes still occur before ACK, logging, and UI work.
+- Confirmed failsafe logic remains active during periods with no RF traffic.
+- Graphics and boot assets are byte-for-byte inherited from v1.6.2.
+- Full PlatformIO/ESP32-S3 build and physical hardware test must run on the user's machine.

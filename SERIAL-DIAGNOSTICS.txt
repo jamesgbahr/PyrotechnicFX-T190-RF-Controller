@@ -1,0 +1,19 @@
+PyrotechnicFX T190 v1.6.3 serial diagnostics
+
+Sender edge lines:
+  [BUTTON] detected=<ms> relay=<1-6> gpio=<pin> state=PRESSED|RELEASED mask=0xNN
+  [TX EDGE] seq=<n> mask=0xNN gen=<n> started=<ms> finished=<ms> detect_to_tx=<ms> airtime=<ms>
+
+The important value is detect_to_tx. With the radio idle it should normally be
+near 0-2 ms. If an earlier LoRa packet is already on air, the newest generation
+is sent immediately after that unavoidable packet airtime ends.
+
+Receiver lines:
+  [RX] seq=<n> requested=0xNN applied=0xNN rssi=<dBm> snr=<dB> ack=SENT
+
+v1.6.3 intentionally does not print an ACK TIMEOUT for every unacknowledged
+packet. Loss of ACK affects telemetry, not button scanning or command scheduling.
+
+A line marked TX EDGE SUPERSEDED means that packet had already started before a
+newer button edge was detected. The newer generation is transmitted immediately
+after that unavoidable in-progress LoRa airtime ends. Complete lines are sent through a nonblocking logger queue; USB/Serial writes no longer run in the input or RF timing paths, and messages are not spliced together.

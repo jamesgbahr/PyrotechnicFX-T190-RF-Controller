@@ -1,0 +1,13 @@
+PYROTECHNICFX T190 RECEIVER v1.6.3
+==================================
+Relay 1 control output: GPIO1
+Relay 2 control output: GPIO2
+Relay 3 control output: GPIO3
+Relay 4 control output: GPIO4
+Relay 5 control output: GPIO15
+Relay 6 control output: GPIO16
+
+Default firmware is configured for active-low relay-driver inputs.
+Do not connect relay coils directly to GPIO pins. Use suitable drivers, common
+ground where required, flyback suppression for inductive loads, and a separate
+relay power supply.
