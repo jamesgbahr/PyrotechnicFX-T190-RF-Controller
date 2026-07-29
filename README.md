@@ -1,8 +1,8 @@
-# PyrotechnicFX T190 RF Relay Controller
+﻿# PyrotechnicFX T190 RF Relay Controller
 
 A custom six-channel LoRa relay-control system for a pair of **Heltec Vision Master T190** devices.
 
-One T190 operates as a handheld transmitter and the other operates as a receiver that controls six external relay inputs. The project includes separate transmitter and receiver firmware, a custom 170×320 display interface, live RF telemetry, immediate momentary control, receiver acknowledgments, communication-loss failsafes, Windows build-and-flash scripts, and detailed serial diagnostics.
+One T190 operates as a handheld transmitter and the other operates as a receiver that controls six external relay inputs. The project includes separate transmitter and receiver firmware, a custom 170Ã—320 display interface, live RF telemetry, immediate momentary control, receiver acknowledgments, communication-loss failsafes, Windows build-and-flash scripts, and detailed serial diagnostics.
 
 **Current confirmed stable baseline: v1.6.3**
 
@@ -12,10 +12,10 @@ One T190 operates as a handheld transmitter and the other operates as a receiver
 
 The PyrotechnicFX T190 RF Relay Controller is a purpose-built wireless control platform for experimental live-event, automation, special-effects, and remote-switching applications.
 
-The system uses the onboard ESP32-S3, SX1262 LoRa radio, and 170×320 display found on the Heltec Vision Master T190. It is divided into two independent PlatformIO projects:
+The system uses the onboard ESP32-S3, SX1262 LoRa radio, and 170Ã—320 display found on the Heltec Vision Master T190. It is divided into two independent PlatformIO projects:
 
-- **Transmitter** — reads momentary control inputs, sends the latest relay state, displays local channel activity, and shows receiver acknowledgments and RF telemetry.
-- **Receiver** — validates control packets, updates six relay-control GPIO outputs, returns acknowledgments, reports link quality, and forces outputs into a safe OFF state when communication is lost.
+- **Transmitter** â€” reads momentary control inputs, sends the latest relay state, displays local channel activity, and shows receiver acknowledgments and RF telemetry.
+- **Receiver** â€” validates control packets, updates six relay-control GPIO outputs, returns acknowledgments, reports link quality, and forces outputs into a safe OFF state when communication is lost.
 
 The firmware is designed around a **latest-state-wins** model so a newly detected button press or release replaces older pending states instead of waiting behind stale packet bursts.
 
@@ -89,7 +89,7 @@ The custom interface can display:
 
 ### Custom PyrotechnicFX interface
 
-The transmitter and receiver use native 170×320 display graphics, including:
+The transmitter and receiver use native 170Ã—320 display graphics, including:
 
 - PyrotechnicFX branded boot screen
 - live boot progress
@@ -147,18 +147,18 @@ Diagnostics include:
 
 ```text
 PyrotechnicFX-T190-RF-Controller/
-├── 1_FLASH_TRANSMITTER.bat
-├── 2_FLASH_RECEIVER.bat
-├── 3_BUILD_TRANSMITTER_ONLY.bat
-├── 4_BUILD_RECEIVER_ONLY.bat
-├── README.md
-├── README-FIRST.txt
-├── LICENSE
-├── SERIAL-DIAGNOSTICS.txt
-├── APPROVED-UI-170x320.png
-├── RELEASE-NOTES-v1.6.3.md
-├── transmitter/
-└── receiver/
+â”œâ”€â”€ 1_FLASH_TRANSMITTER.bat
+â”œâ”€â”€ 2_FLASH_RECEIVER.bat
+â”œâ”€â”€ 3_BUILD_TRANSMITTER_ONLY.bat
+â”œâ”€â”€ 4_BUILD_RECEIVER_ONLY.bat
+â”œâ”€â”€ README.md
+â”œâ”€â”€ README-FIRST.txt
+â”œâ”€â”€ LICENSE
+â”œâ”€â”€ SERIAL-DIAGNOSTICS.txt
+â”œâ”€â”€ APPROVED-UI-170x320.png
+â”œâ”€â”€ RELEASE-NOTES-v1.6.3.md
+â”œâ”€â”€ transmitter/
+â””â”€â”€ receiver/
 ```
 
 The transmitter and receiver are separate PlatformIO projects.
@@ -167,8 +167,8 @@ The transmitter and receiver are separate PlatformIO projects.
 
 ## Required Hardware
 
-- 2× Heltec Vision Master T190
-- 2× suitable 915 MHz antennas
+- 2Ã— Heltec Vision Master T190
+- 2Ã— suitable 915 MHz antennas
 - USB data cables
 - momentary transmitter buttons
 - external relay or opto-isolated input board
@@ -178,6 +178,136 @@ The transmitter and receiver are separate PlatformIO projects.
 
 ---
 
+## Transmitter Button GPIO Inputs
+
+### Current v1.6.3 development mapping
+
+The transmitter firmware currently defines:
+
+```cpp
+constexpr uint8_t SENDER_BUTTONS[6] = {21, 1, 2, 3, 4, 15};
+```
+
+| Channel | Current input | GPIO | Notes |
+|---|---|---:|---|
+| 1 | Onboard USER button | GPIO 21 | Built into the T190; useful for development and bench testing |
+| 2 | External momentary button | GPIO 1 | Also connected to the QL/Qwiic I²C header |
+| 3 | External momentary button | GPIO 2 | Also connected to the QL/Qwiic I²C header |
+| 4 | External momentary button | GPIO 3 | Exposed on header J3 |
+| 5 | External momentary button | GPIO 4 | Exposed on header J3 |
+| 6 | External momentary button | GPIO 15 | Exposed on header J2 |
+
+The buttons use the ESP32 internal pull-up resistors and are wired as normally-open contacts:
+
+```text
+GPIO input → normally-open momentary button → GND
+```
+
+The electrical state is:
+
+```text
+Released = HIGH
+Pressed  = LOW
+```
+
+### Important production note
+
+GPIO 21 is the onboard USER button. It is not presented as a normal external button connection on the T190 headers, so a finished six-button handheld enclosure should remap Channel 1 to an exposed GPIO.
+
+The firmware pin assignments are located in:
+
+```text
+transmitter/include/board_pins.h
+```
+
+The onboard hardware already reserves these GPIOs in this project:
+
+| Function | GPIOs |
+|---|---|
+| TFT display and power | 7, 17, 38, 39, 40, 47, 48 |
+| SX1262 LoRa radio | 8, 9, 10, 11, 12, 13, 14 |
+| Battery measurement | 5, 6 |
+| Onboard USER button | 21 |
+
+Do not assign external buttons to the display, radio, or battery-monitor pins.
+
+GPIO 1 and GPIO 2 are shared with the QL/Qwiic I²C connector. They may be used as buttons only when that connector is not being used for an I²C peripheral.
+
+GPIO 16 is exposed on J2 and is marked `32K_N` on the T190 pin map. It can be considered for the sixth external button only after confirming that the 32 kHz function is not needed in the finished hardware.
+
+### Recommended production remap
+
+For a six-external-button transmitter that does not use the QL/Qwiic connector or the `32K_N` function, change the array to:
+
+```cpp
+constexpr uint8_t SENDER_BUTTONS[6] = {16, 1, 2, 3, 4, 15};
+```
+
+This changes Channel 1 from the onboard GPIO 21 button to an external button on GPIO 16.
+
+Production wiring then becomes:
+
+| Channel | External button GPIO |
+|---|---:|
+| 1 | GPIO 16 |
+| 2 | GPIO 1 |
+| 3 | GPIO 2 |
+| 4 | GPIO 3 |
+| 5 | GPIO 4 |
+| 6 | GPIO 15 |
+
+### How to change the transmitter pin mapping
+
+1. Open:
+
+```text
+transmitter/include/board_pins.h
+```
+
+2. Find:
+
+```cpp
+constexpr uint8_t SENDER_BUTTONS[6] = {21, 1, 2, 3, 4, 15};
+```
+
+3. Replace it with the production mapping:
+
+```cpp
+constexpr uint8_t SENDER_BUTTONS[6] = {16, 1, 2, 3, 4, 15};
+```
+
+4. Save the file.
+
+5. Rebuild the transmitter:
+
+```text
+3_BUILD_TRANSMITTER_ONLY.bat
+```
+
+6. Flash the updated transmitter:
+
+```text
+1_FLASH_TRANSMITTER.bat
+```
+
+7. Bench-test every input with the receiver disconnected from production loads.
+
+8. Verify in the serial monitor that each physical button activates only its assigned channel and returns immediately to OFF when released.
+
+### Production validation checklist
+
+Before final enclosure wiring:
+
+- confirm all six selected GPIOs are physically exposed on the exact T190 board revision
+- confirm the QL/Qwiic connector will not be used when GPIO 1 and GPIO 2 are assigned to buttons
+- confirm the `32K_N` function will not be used when GPIO 16 is assigned to a button
+- verify no selected pin is used elsewhere in custom firmware
+- use normally-open momentary switches
+- keep button wiring short and protected from electrical noise
+- add external filtering or debounce hardware when required by the installation
+- test with LEDs or a logic analyzer before connecting relay or effect-control hardware
+
+---
 ## Receiver GPIO Outputs
 
 | Channel | GPIO |
@@ -202,9 +332,9 @@ Power the relay board from a separate regulated supply appropriate for the selec
 Typical connection:
 
 ```text
-T190 GPIO        → Relay-board input
-T190 GND         → Relay-board control ground
-External supply  → Relay-board power input
+T190 GPIO        â†’ Relay-board input
+T190 GND         â†’ Relay-board control ground
+External supply  â†’ Relay-board power input
 ```
 
 Confirm that the relay-board inputs accept 3.3 V logic.
@@ -235,7 +365,7 @@ cd PyrotechnicFX-T190-RF-Controller
 Or use:
 
 ```text
-GitHub → Code → Download ZIP
+GitHub â†’ Code â†’ Download ZIP
 ```
 
 Extract the ZIP before running the batch files.
@@ -463,6 +593,7 @@ Software and wireless communication must never be the only safety layer.
 
 ## License
 
-Copyright © PyrotechnicFX.
+Copyright Â© PyrotechnicFX.
 
 See `LICENSE` for the repository usage terms.
+
